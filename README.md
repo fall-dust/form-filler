@@ -1,5 +1,7 @@
 # 表单填写器 · Windows 客户端
 
+![image-20260918230736605](E:/0/JNXY/form_filler/README.assets/image-20260918230736605.png)
+
 Electron + React + Playwright 的表单自动填写客户端，核心是「粘贴 HTML → 生成提示词 → 问 AI 拿到题目/答案配置 → 一键填写」。详见 [客户端方案.md](客户端方案.md)（设计）；[需求文档.md](需求文档.md) 为最初 Python CLI 需求，已废弃。
 
 ## 使用流程
