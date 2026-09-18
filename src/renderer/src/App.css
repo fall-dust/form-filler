@@ -1,0 +1,250 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1f2328;
+  background: #f6f8fa;
+}
+.app {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px 20px 48px;
+}
+h1 {
+  font-size: 20px;
+  margin: 8px 0 4px;
+}
+.tabbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 12px 0 12px;
+  flex-wrap: wrap;
+}
+.task-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #57606a;
+  border: 1px solid #d0d7de;
+  border-radius: 6px 6px 0 0;
+  background: #f6f8fa;
+  user-select: none;
+}
+.task-tab.active {
+  color: #0969da;
+  background: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #0969da;
+}
+.task-tab .close {
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: #57606a;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.task-tab .close:hover {
+  color: #cf222e;
+}
+.task-tab .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1f883d;
+  display: inline-block;
+}
+.add-tab {
+  padding: 6px 12px;
+  border: 1px dashed #d0d7de;
+  border-radius: 6px;
+  background: none;
+  color: #57606a;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 16px;
+  border-bottom: 1px solid #d0d7de;
+}
+.tab {
+  padding: 8px 16px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #57606a;
+  border-bottom: 2px solid transparent;
+}
+.tab.active {
+  color: #0969da;
+  border-bottom-color: #0969da;
+  font-weight: 600;
+}
+label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #57606a;
+}
+input[type='text'],
+textarea,
+select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+textarea {
+  min-height: 130px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.row > div {
+  flex: 1;
+  min-width: 120px;
+}
+button {
+  padding: 6px 14px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #f6f8fa;
+  cursor: pointer;
+  font-size: 14px;
+  color: #24292f;
+}
+button.primary {
+  background: #1f883d;
+  border-color: #1f883d;
+  color: #fff;
+}
+button.danger {
+  background: #cf222e;
+  border-color: #cf222e;
+  color: #fff;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button.link {
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: #0969da;
+  font-size: 12px;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: hidden;
+}
+th,
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eaeef2;
+  text-align: left;
+  font-size: 13px;
+  vertical-align: top;
+}
+th {
+  background: #f6f8fa;
+  font-weight: 600;
+}
+td.answer input {
+  min-width: 140px;
+}
+.badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.badge.filled {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+.badge.missing {
+  background: #fff8c5;
+  color: #9a6700;
+}
+.badge.failed {
+  background: #ffebe9;
+  color: #cf222e;
+}
+.summary {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+}
+.summary > div {
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 10px 18px;
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  width: 440px;
+}
+.modal h2 {
+  font-size: 16px;
+  margin-top: 0;
+}
+.warn {
+  color: #9a6700;
+  font-size: 13px;
+}
+.error-banner {
+  background: #ffebe9;
+  border: 1px solid #ff818266;
+  color: #cf222e;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+.hint {
+  color: #57606a;
+  font-size: 12px;
+}

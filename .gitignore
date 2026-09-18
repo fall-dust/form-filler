@@ -1,0 +1,11 @@
+node_modules/
+out/
+dist/
+browsers/
+*.log
+.DS_Store
+
+# 运行产物 / 敏感数据（见 需求文档.md §3）
+profile/
+output/
+reports/

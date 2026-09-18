@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>样例调查问卷（九类题型）</title>
+</head>
+<body>
+  <h1>客户满意度调查</h1>
+  <form id="survey">
+
+    <!-- 1. text -->
+    <div class="form-item">
+      <label for="name">你的姓名？</label>
+      <input type="text" id="name" name="name" />
+    </div>
+
+    <!-- 2. textarea -->
+    <div class="form-item">
+      <label for="suggestion">你的建议？</label>
+      <textarea id="suggestion" name="suggestion"></textarea>
+    </div>
+
+    <!-- 3. radio -->
+    <fieldset>
+      <legend>性别？</legend>
+      <label><input type="radio" name="gender" value="男" /> 男</label>
+      <label><input type="radio" name="gender" value="女" /> 女</label>
+      <label><input type="radio" name="gender" value="保密" /> 保密</label>
+    </fieldset>
+
+    <!-- 4. judge -->
+    <fieldset>
+      <legend>是否同意本协议？</legend>
+      <label><input type="radio" name="agree" value="是" /> 是</label>
+      <label><input type="radio" name="agree" value="否" /> 否</label>
+    </fieldset>
+
+    <!-- 5. checkbox -->
+    <fieldset>
+      <legend>你感兴趣的功能？（可多选）</legend>
+      <label><input type="checkbox" name="features" value="自动填表" /> 自动填表</label>
+      <label><input type="checkbox" name="features" value="智能解析" /> 智能解析</label>
+      <label><input type="checkbox" name="features" value="断点续填" /> 断点续填</label>
+    </fieldset>
+
+    <!-- 6. select -->
+    <div class="form-item">
+      <label for="satisfaction">满意度？</label>
+      <select id="satisfaction" name="satisfaction">
+        <option value="5">非常满意</option>
+        <option value="4">满意</option>
+        <option value="3">一般</option>
+      </select>
+    </div>
+
+    <!-- 7. date -->
+    <div class="form-item">
+      <label for="birthday">出生日期？</label>
+      <input type="date" id="birthday" name="birthday" />
+    </div>
+
+    <!-- 8. file -->
+    <div class="form-item">
+      <label for="avatar">上传头像？</label>
+      <input type="file" id="avatar" name="avatar" />
+    </div>
+
+    <!-- 9. matrix -->
+    <table class="matrix">
+      <caption>请对以下各项满意度打分</caption>
+      <thead>
+        <tr><th>题目</th><th>非常满意</th><th>满意</th><th>一般</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>服务态度</td>
+          <td><input type="radio" name="m1" value="非常满意" /></td>
+          <td><input type="radio" name="m1" value="满意" /></td>
+          <td><input type="radio" name="m1" value="一般" /></td>
+        </tr>
+        <tr>
+          <td>产品质量</td>
+          <td><input type="radio" name="m2" value="非常满意" /></td>
+          <td><input type="radio" name="m2" value="满意" /></td>
+          <td><input type="radio" name="m2" value="一般" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </form>
+</body>
+</html>

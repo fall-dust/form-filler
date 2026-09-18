@@ -1,0 +1,25 @@
+appId: com.jnxy.formfiller
+productName: 表单填写器
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**
+  - samples/**
+  - package.json
+extraResources:
+  - from: browsers
+    to: browsers
+# Playwright 的 driver 子进程需在 asar 外才能被 ELECTRON_RUN_AS_NODE 加载
+asarUnpack:
+  - node_modules/playwright/**
+  - node_modules/playwright-core/**
+win:
+  target:
+    - nsis
+    - portable
+  # 无签名证书，跳过签名与 exe 资源编辑（避免下载 winCodeSign 触发符号链接解压失败）
+  signAndEditExecutable: false
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
