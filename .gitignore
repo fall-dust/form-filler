@@ -1,6 +1,7 @@
 node_modules/
 out/
 dist/
+release/
 browsers/
 *.log
 .DS_Store

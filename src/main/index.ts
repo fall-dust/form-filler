@@ -52,11 +52,17 @@ ipcMain.handle('fill:run', async (event, req: FillRequest, runId: string) => {
       ...req.config,
       outputDir: isAbsolute(req.config.outputDir)
         ? req.config.outputDir
-        : join(app.getPath('userData'), req.config.outputDir),
-      // 打包后浏览器内核随包分发在 resources/browsers/，dev 用 Playwright 默认
-      executablePath: app.isPackaged && !req.config.channel
-        ? join(process.resourcesPath, 'browsers', 'chromium', 'chrome-win64', 'chrome.exe')
-        : undefined
+        : join(app.getPath('userData'), req.config.outputDir)
+    }
+  }
+
+  // 浏览器解析：优先随包 chromium；若缺失（如 portable 单文件解压到临时目录时 extraResources 未解出）则回退系统 Edge
+  if (app.isPackaged && !normalized.config.channel) {
+    const bundled = join(process.resourcesPath, 'browsers', 'chromium', 'chrome-win64', 'chrome.exe')
+    if (existsSync(bundled)) {
+      normalized.config.executablePath = bundled
+    } else {
+      normalized.config.channel = 'msedge'
     }
   }
   try {
