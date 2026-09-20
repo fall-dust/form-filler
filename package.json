@@ -1,6 +1,6 @@
 {
   "name": "form-filler-client",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "表单填写器 Windows 客户端（Electron + Playwright + 智能解析）",
   "main": "./out/main/index.js",
   "author": "JNXY",
@@ -12,12 +12,13 @@
     "test": "vitest run",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
-    "dist": "node scripts/bundle-browsers.mjs && electron-vite build && electron-builder"
+    "dist": "node scripts/bundle-browsers.mjs && electron-vite build && electron-builder",
+    "check:browser": "node scripts/check-bundled-browser.mjs"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
     "domhandler": "^5.0.3",
-    "playwright": "^1.47.0"
+    "playwright-core": "^1.47.0"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
@@ -28,6 +29,7 @@
     "electron": "^33.0.0",
     "electron-builder": "^25.1.8",
     "electron-vite": "^2.3.0",
+    "playwright": "^1.47.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "typescript": "^5.5.4",

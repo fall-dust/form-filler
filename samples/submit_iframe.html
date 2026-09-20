@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>iframe 内提交样例</title>
+</head>
+<body>
+  <!-- 提交按钮只存在于 iframe 内（srcdoc 子 frame），主页面没有任何按钮；
+       用于验证 trySubmit 的全 frame 扫描 -->
+  <iframe
+    srcdoc="<form><div>iframe 内的表单</div><button type='button' onclick='parent.__iframeSubmitted=true'>提交</button></form>"
+    width="420"
+    height="140"
+  ></iframe>
+</body>
+</html>

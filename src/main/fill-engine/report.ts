@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
-import type { Page } from 'playwright'
+import type { Page } from 'playwright-core'
 import type { FillReport } from './types'
 
 function timestamp(): string {
@@ -26,7 +26,8 @@ export async function screenshotOnFail(
   try {
     mkdirSync(dir, { recursive: true })
     const p = join(dir, `${id}_fail_${timestamp()}.png`)
-    await page.screenshot({ path: p })
+    // 显式给超时：会话的默认超时被压到 5s（见 browser.ts），对截图来说太短
+    await page.screenshot({ path: p, timeout: 20_000 })
     return p
   } catch {
     return null

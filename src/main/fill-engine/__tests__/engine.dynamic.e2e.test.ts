@@ -70,6 +70,10 @@ describe('fill-engine 动态读取选项（AI 导入路径）', () => {
     expect(state.feat2).toBe(true)
     expect(state.satisfaction).toBe('4') // 「满意」对应 value 4
 
-    await browser.close()
+    // 收尾保护：本机环境下 chromium 偶发退出挂起，不阻塞测试结论
+    await Promise.race([
+      browser.close(),
+      new Promise((r) => setTimeout(r, 5000))
+    ]).catch(() => {})
   }, 60000)
 })

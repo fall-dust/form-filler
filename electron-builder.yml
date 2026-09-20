@@ -12,8 +12,17 @@ extraResources:
     to: browsers
 # Playwright 的 driver 子进程需在 asar 外才能被 ELECTRON_RUN_AS_NODE 加载
 asarUnpack:
-  - node_modules/playwright/**
   - node_modules/playwright-core/**
+  # 旧版依赖残留（已改用 playwright-core，此处保留兼容老 lockfile 的构建）
+  - node_modules/playwright/**
+# 只保留中英语言包，直接省掉约 80 MB（Electron 会回退到 en-US）
+electronLanguages:
+  - zh-CN
+  - en-US
+# 最大化压缩（7z LZMA solid）：安装包更小，代价是构建时间明显变长
+compression: maximum
+# 打包后、生成安装包前做一遍瘦身：精简随包 Chromium 与 playwright-core
+afterPack: ./scripts/prune-package.mjs
 win:
   target:
     - nsis
@@ -23,3 +32,5 @@ win:
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  # 本应用无自动更新（未接 electron-updater），跳过差分包以省构建时间与 .blockmap 产物
+  differentialPackage: false

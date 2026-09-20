@@ -1,3 +1,5 @@
+import { normalizeAnswers } from '../../shared/contracts/answers'
+import { QUESTION_TYPES, isQuestionType } from '../../shared/contracts/question'
 import type { Question, QuestionType, SelectorStrategy } from './types'
 
 /**
@@ -12,20 +14,31 @@ const PROMPT_TEMPLATE = `你是网页表单自动化配置专家。下面是某�
 每道题对象的字段定义如下：
 - id：题目编号，按出现顺序 "q1"、"q2"… 递增
 - question：题干文字；若 HTML 中无法直接判断题干，可据选项内容推断一句简短描述，实在没有则填 ""
-- type：题型，只能是以下之一：text / textarea / radio / judge / checkbox / select / date / file / matrix
+- type：题型，只能是以下之一：{{TYPES}}
   · 单选用 radio；若只有「对/错」「是/否」两个选项用 judge
-  · 多选用 checkbox；下拉框用 select；多行简答用 textarea；日期用 date；文件上传用 file
-- options：选项文字数组（radio/checkbox/select/judge 必填，其余给 []），必须按 DOM 出现顺序
+  · 多选用 checkbox；原生 <select> 下拉用 select；多行简答用 textarea；文件上传用 file
+  · matrix：矩阵/表格题（行×列单选格）
+  · slider：滑条（input[type=range]、.el-slider、.ant-slider 等轨道控件）；answer 为数值
+  · rate：星级评分（.el-rate、.ant-rate、一排星星图标）；answer 为星数（如 "4"）
+  · switch：开关（.el-switch、.ant-switch、checkbox 样式切换）；answer 为 "true"/"false"
+  · richselect：div 模拟的下拉（.el-select、.ant-select、role=combobox，点击后弹出浮层选项）；options 给浮层里可见的选项文字
+  · richtext：富文本编辑器（contenteditable、.ql-editor、.tox-editable）；answer 为纯文本
+  · date：日期；原生 input[type=date] 或弹出日历面板的输入框都算
+- options：选项文字数组（radio/checkbox/select/judge/richselect 必填，其余给 []），必须按 DOM 出现顺序
 - optionValues：与 options 一一对应的 value 属性值数组；无 value 则用该选项文字本身
 - selectors：定位策略数组（回退链），每项是 {"css":"…"} 或 {"xpath":"…"} 或 {"text":"题干文字"} 之一
-  · 优先稳定 css：id、name、data-* 属性
-  · 单选/多选：css 必须能定位到「整组选项」的全部 input（例如 input[name="q1"]），并保证 options 顺序与该组 input 的 DOM 顺序一致
-  · 下拉框：css 定位到 select 元素
+  · 优先稳定 css：题目容器的 id（如 #question_q-38-8883）、data-* 属性 —— 这类值换页面/重渲染都稳定
+  · 单选/多选：css 必须能定位到「整组选项」的全部 input，首选「题目容器 + input[type=radio/checkbox]」写法（如 #question_q-38-8883 input[type=radio]），并保证 options 顺序与该组 input 的 DOM 顺序一致
+  · 严禁把「自动生成、会变」的值当作定位依据：形如 name="809-q-38-8883"（数字前缀+题目号）、id="input_1a2b"、uid、时间戳等，换一次渲染/换一页就变了。特别注意：某些问卷平台（如腾讯问卷 wj.qq.com）**同一道题的每个选项 name 都不一样**，写 name 只能命中其中一个选项 —— 这种情况必须用题目容器选择器包住整组，不要逐个写 name
+  · 下拉框（select 与 richselect）：css 定位到可点击的下拉控件本身（原生 select 元素，或 .el-select / .ant-select / .t-select 这类触发器，腾讯问卷的下拉就是 TDesign 的 .t-select）
+  · slider/rate/switch/richtext：css 定位到控件根元素
   · 无 id/name 时：用题干文字的 text 策略，或给出唯一定位该题容器的 css/xpath
+  · 建议给 2~4 条候选（从最稳到最泛），定位失败时可逐条回退
 
 硬性要求：
 1. 一道选择题的 A/B/C/D 是它的「选项」，必须合并成一道题，绝不拆成多道。
-2. 严格只输出 JSON 数组本身，不要任何解释文字、不要用 markdown 代码块包裹、不要加任何前后缀。
+2. 无法判断的控件在 hint 字段写明疑问（如 "hint": "疑似评分控件，图标非标准星级"），不要强行归类；确实无法作答的控件直接跳过，不要编造。
+3. 严格只输出 JSON 数组本身，不要任何解释文字、不要用 markdown 代码块包裹、不要加任何前后缀。
 
 HTML 源码如下（以「===== HTML 开始 =====」和「===== HTML 结束 =====」为界）：
 
@@ -45,18 +58,29 @@ const ANSWER_PROMPT_TEMPLATE = `你是表单填写助手。下面是一份问卷
 
 输出要求：
 - 输出一个 JSON 对象，键为题目 id（如 "q1"），值为该题的答案
-- 单选(radio)/判断(judge)/下拉(select)：值必须是该题 options 里已列出的一个选项文字
+- 单选(radio)/判断(judge)/下拉(select)/自定义下拉(richselect)：值必须是该题 options 里已列出的一个选项文字
 - 多选(checkbox)：值是选项文字组成的数组
 - 文本(text)/多行(textarea)：值是简短合理的文本
 - 日期(date)：值是 "YYYY-MM-DD" 格式字符串
 - 文件(file)：值是本地文件路径字符串
 - 矩阵(matrix)：值是该题 options 里已列出的一个选项文字（应用到所有行）
+- 滑条(slider)：值是数字字符串（在题目标注的范围内，如 "75"）
+- 星级(rate)：值是数字字符串（星数，如 "4"）
+- 开关(switch)：值是 "true" 或 "false"
+- 富文本(richtext)：值是纯文本（无 HTML 标签）
 
 严格只输出 JSON 对象，不要解释文字、不要 markdown 代码块、不要前后缀。
 `
 
+/**
+ * 题型清单（提示词里那一行）。
+ * 从 `shared/contracts/question.ts` 派生 —— 原先这行是手写死的字符串，
+ * 加一种题型时最容易漏的就是它（模型于是永远不知道有这种题型）。
+ */
+const QUESTION_TYPE_LIST = QUESTION_TYPES.join(' / ')
+
 export function buildPrompt(html: string): string {
-  return PROMPT_TEMPLATE.replace('{{HTML}}', html.trim())
+  return PROMPT_TEMPLATE.replace('{{TYPES}}', QUESTION_TYPE_LIST).replace('{{HTML}}', html.trim())
 }
 
 export function buildAnswerPrompt(questions: Question[], goal?: string): string {
@@ -72,18 +96,6 @@ export function buildAnswerPrompt(questions: Question[], goal?: string): string 
     JSON.stringify(qs, null, 2)
   )
 }
-
-const TYPES: QuestionType[] = [
-  'text',
-  'textarea',
-  'radio',
-  'judge',
-  'checkbox',
-  'select',
-  'date',
-  'file',
-  'matrix'
-]
 
 function normalizeSelector(s: Record<string, unknown>): SelectorStrategy {
   const out: SelectorStrategy = {}
@@ -136,10 +148,8 @@ export function parseImportedQuestions(
     const o = it as Record<string, unknown>
 
     const id = typeof o.id === 'string' && o.id ? o.id : `q${i + 1}`
-    const type: QuestionType =
-      typeof o.type === 'string' && (TYPES as string[]).includes(o.type)
-        ? (o.type as QuestionType)
-        : 'text'
+    // 白名单来自 `shared/contracts/question.ts`（原先这里另有一份 TYPES 数组）
+    const type: QuestionType = isQuestionType(o.type) ? o.type : 'text'
     const question = typeof o.question === 'string' ? o.question : ''
 
     const options = Array.isArray(o.options)
@@ -178,11 +188,7 @@ export function parseImportedAnswers(
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return { error: '期望一个 JSON 对象（形如 { "q1": "答案" }）' }
   }
-  const answers: Record<string, string> = {}
-  for (const [k, v] of Object.entries(data as Record<string, unknown>)) {
-    if (Array.isArray(v)) answers[k] = v.map((x) => String(x)).join(',')
-    else if (v === null || v === undefined) answers[k] = ''
-    else answers[k] = String(v)
-  }
-  return { answers }
+  // 归一化规则与主进程的导入清洗（tasks/sanitize.ts）共用同一份实现 ——
+  // 否则「粘贴导入」与「文件导入」会在多选、空值上给出不同结果。
+  return { answers: normalizeAnswers(data) }
 }

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>问卷网结构复刻（自定义 ws-radio 控件）</title>
+    <!--
+      复刻问卷网（wenjuan.group）的两点关键结构，用于回归测试：
+
+      1. 选项不是原生受控控件，而是 `<div role="radio" class="ws-radio">`；原生
+         `<input type="radio" class="ws-radio__original" aria-hidden="true">` 被样式压成
+         零尺寸、完全不可见，只是组件内部的附属物。
+      2. 选项文字放在**兄弟节点** `.ws-radio__label > .option-title` 里，
+         原生 input 自身与其直接父级 `.ws-radio__input` 都没有文字 ——
+         按「祖先 label / 父级 label / 父级 innerText」全都取不到。
+    -->
+    <style>
+      body { font: 14px/1.6 "Microsoft YaHei", sans-serif; padding: 20px; color: #222; }
+      .question-box { margin-bottom: 28px; }
+      .question-title { font-weight: 600; margin-bottom: 10px; }
+      .option-box { padding-left: 8px; }
+      .relate-options { display: block; }
+      .ws-radio, .ws-checkbox { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; cursor: pointer; }
+      .ws-radio__input, .ws-checkbox__input { position: relative; display: inline-flex; width: 16px; height: 16px; flex: none; }
+      .ws-radio__inner { width: 16px; height: 16px; border: 1px solid #bbb; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; }
+      .ws-radio.is-checked .ws-radio__inner { border-color: #2f6fed; }
+      .ws-radio.is-checked .ws-radio__inner .circle { width: 8px; height: 8px; border-radius: 50%; background: #2f6fed; }
+      .ws-checkbox__inner { width: 16px; height: 16px; border: 1px solid #bbb; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; }
+      .ws-checkbox.is-checked .ws-checkbox__inner { border-color: #2f6fed; background: #2f6fed; color: #fff; }
+      .ws-checkbox.is-checked .ws-checkbox__inner .mark { font-size: 11px; line-height: 1; }
+      /* 原生控件被彻底隐藏：零尺寸 + aria-hidden，Playwright 视为不可见 */
+      .ws-radio__original, .ws-checkbox__original {
+        position: absolute; width: 0; height: 0; opacity: 0; margin: 0; padding: 0; pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="question-warper">
+      <!-- q1：radio，组件只维护自己的 is-checked 类，**不同步**原生 input.checked -->
+      <div id="question-6aae2dbbe123a0d46aa18de4" class="question-box">
+        <div class="q-title-box">
+          <div class="question-title">
+            <span class="question-seq"><span class="question-start">*</span>1.</span>
+            您通常需要多长时间才能入睡（从上床准备睡觉到睡着的时长）？
+          </div>
+        </div>
+        <div class="q-content-wrap">
+          <div role="radiogroup" class="ws-radio-group option-group">
+            <div class="option-box">
+              <div class="relate-options options">
+                <div role="radio" tabindex="0" class="ws-radio" data-value="6aae2dbbe123a0d46aa18de0">
+                  <span class="ws-radio__input">
+                    <span class="ws-radio__inner"><div class="circle"></div></span>
+                    <input type="radio" aria-hidden="true" tabindex="-1" value="6aae2dbbe123a0d46aa18de0" class="ws-radio__original" />
+                  </span>
+                  <span class="ws-radio__label">
+                    <div class="option-title option-image-preview">≤15分钟</div>
+                  </span>
+                </div>
+                <div role="radio" tabindex="-1" class="ws-radio" data-value="6aae2dbbe123a0d46aa18de1">
+                  <span class="ws-radio__input">
+                    <span class="ws-radio__inner"><div class="circle"></div></span>
+                    <input type="radio" aria-hidden="true" tabindex="-1" value="6aae2dbbe123a0d46aa18de1" class="ws-radio__original" />
+                  </span>
+                  <span class="ws-radio__label">
+                    <div class="option-title option-image-preview">16-30分钟</div>
+                  </span>
+                </div>
+                <div role="radio" tabindex="-1" class="ws-radio" data-value="6aae2dbbe123a0d46aa18de2">
+                  <span class="ws-radio__input">
+                    <span class="ws-radio__inner"><div class="circle"></div></span>
+                    <input type="radio" aria-hidden="true" tabindex="-1" value="6aae2dbbe123a0d46aa18de2" class="ws-radio__original" />
+                  </span>
+                  <span class="ws-radio__label">
+                    <div class="option-title option-image-preview">31-60分钟</div>
+                  </span>
+                </div>
+                <div role="radio" tabindex="-1" class="ws-radio" data-value="6aae2dbbe123a0d46aa18de3">
+                  <span class="ws-radio__input">
+                    <span class="ws-radio__inner"><div class="circle"></div></span>
+                    <input type="radio" aria-hidden="true" tabindex="-1" value="6aae2dbbe123a0d46aa18de3" class="ws-radio__original" />
+                  </span>
+                  <span class="ws-radio__label">
+                    <div class="option-title option-image-preview">＞60分钟</div>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- q2：checkbox，组件同时维护原生 input.checked（另一种常见实现） -->
+      <div id="question-6aae2dbee123a0d46aa18df2" class="question-box">
+        <div class="q-title-box">
+          <div class="question-title">
+            <span class="question-seq"><span class="question-start">*</span>2.</span>
+            夜间醒来后，你会做哪些事？
+          </div>
+        </div>
+        <div class="q-content-wrap">
+          <div role="group" class="ws-checkbox-group option-group">
+            <div class="option-box">
+              <div class="relate-options options">
+                <div role="checkbox" tabindex="0" class="ws-checkbox" data-value="c0">
+                  <span class="ws-checkbox__input">
+                    <span class="ws-checkbox__inner"><span class="mark"></span></span>
+                    <input type="checkbox" aria-hidden="true" tabindex="-1" value="c0" class="ws-checkbox__original" />
+                  </span>
+                  <span class="ws-checkbox__label">
+                    <div class="option-title option-image-preview">看手机</div>
+                  </span>
+                </div>
+                <div role="checkbox" tabindex="-1" class="ws-checkbox" data-value="c1">
+                  <span class="ws-checkbox__input">
+                    <span class="ws-checkbox__inner"><span class="mark"></span></span>
+                    <input type="checkbox" aria-hidden="true" tabindex="-1" value="c1" class="ws-checkbox__original" />
+                  </span>
+                  <span class="ws-checkbox__label">
+                    <div class="option-title option-image-preview">喝水</div>
+                  </span>
+                </div>
+                <div role="checkbox" tabindex="-1" class="ws-checkbox" data-value="c2">
+                  <span class="ws-checkbox__input">
+                    <span class="ws-checkbox__inner"><span class="mark"></span></span>
+                    <input type="checkbox" aria-hidden="true" tabindex="-1" value="c2" class="ws-checkbox__original" />
+                  </span>
+                  <span class="ws-checkbox__label">
+                    <div class="option-title option-image-preview">上厕所</div>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 模拟问卷网 ws-* 组件的行为。故意做成两种：
+      //  - radio 组：只切 is-checked，**不同步**原生 input.checked（真实踩到的那种）
+      //  - checkbox 组：is-checked 与原生 checked 一起维护
+      window.__clicks = 0
+      document.querySelectorAll('.ws-radio-group, .ws-checkbox-group').forEach(function (group) {
+        var isMulti = group.classList.contains('ws-checkbox-group')
+        group.addEventListener('click', function (e) {
+          var item = e.target.closest('.ws-radio, .ws-checkbox')
+          if (!item || !group.contains(item)) return
+          window.__clicks++
+          var input = item.querySelector('input')
+          if (isMulti) {
+            var next = !item.classList.contains('is-checked')
+            item.classList.toggle('is-checked', next)
+            if (input) input.checked = next
+          } else {
+            group.querySelectorAll('.ws-radio').forEach(function (x) {
+              x.classList.remove('is-checked')
+              var xi = x.querySelector('input')
+              if (xi) xi.checked = false
+              x.setAttribute('tabindex', '-1')
+            })
+            item.classList.add('is-checked')
+            item.setAttribute('tabindex', '0')
+            // 注意：这里**故意不动** input.checked，复刻问卷网的真实行为
+          }
+        })
+      })
+    </script>
+  </body>
+</html>

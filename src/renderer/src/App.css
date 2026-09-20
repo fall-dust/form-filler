@@ -8,19 +8,29 @@ body {
   background: #f6f8fa;
 }
 .app {
-  max-width: 1000px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 16px 20px 48px;
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 h1 {
   font-size: 20px;
   margin: 8px 0 4px;
 }
+
+/* 任务标签 */
 .tabbar {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 12px 0 12px;
+  margin: 10px 0 12px;
   flex-wrap: wrap;
 }
 .task-tab {
@@ -32,7 +42,7 @@ h1 {
   font-size: 13px;
   color: #57606a;
   border: 1px solid #d0d7de;
-  border-radius: 6px 6px 0 0;
+  border-radius: 6px;
   background: #f6f8fa;
   user-select: none;
 }
@@ -40,7 +50,7 @@ h1 {
   color: #0969da;
   background: #fff;
   font-weight: 600;
-  border-bottom: 2px solid #0969da;
+  border-color: #0969da;
 }
 .task-tab .close {
   padding: 0 4px;
@@ -71,25 +81,39 @@ h1 {
   font-size: 14px;
 }
 
-.tabs {
+/* 左右布局：侧栏 + 主流水线 */
+.layout-body {
   display: flex;
-  gap: 8px;
-  margin: 12px 0 16px;
-  border-bottom: 1px solid #d0d7de;
+  gap: 14px;
+  align-items: flex-start;
+  flex: 1;
 }
-.tab {
-  padding: 8px 16px;
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-size: 14px;
+.sidebar {
+  width: 260px;
+  flex: none;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 14px;
+  position: sticky;
+  top: 12px;
+}
+.side-title {
+  font-size: 12px;
   color: #57606a;
-  border-bottom: 2px solid transparent;
+  margin: 0 0 8px;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
-.tab.active {
-  color: #0969da;
-  border-bottom-color: #0969da;
-  font-weight: 600;
+.side-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.side-row input,
+.side-row select {
+  flex: 1;
+  min-width: 0;
 }
 label {
   display: block;
@@ -97,6 +121,110 @@ label {
   margin-bottom: 4px;
   color: #57606a;
 }
+label.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  cursor: pointer;
+}
+label.check-danger {
+  color: #b35900;
+}
+label.check-danger input[type='checkbox'] {
+  accent-color: #d97706;
+}
+.main-flow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 步骤卡流水线 */
+.step-card {
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.step-card.current {
+  border-color: #0969da;
+}
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.step-head:hover {
+  background: #f6f8fa;
+}
+.step-dot {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+.step-dot.done {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+.step-dot.active {
+  border: 2px solid #0969da;
+  color: #0969da;
+  font-weight: 600;
+}
+.step-dot.idle {
+  border: 1px solid #d0d7de;
+  color: #57606a;
+}
+.step-titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.step-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+.step-summary {
+  font-size: 12px;
+  color: #57606a;
+}
+.step-actions {
+  display: flex;
+  gap: 8px;
+}
+.step-fold {
+  border: none;
+  background: none;
+  color: #57606a;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+.step-body {
+  padding: 2px 14px 14px;
+  border-top: 1px solid #eaeef2;
+  padding-top: 12px;
+}
+.manual-channel {
+  border: 1px dashed #d0d7de;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  background: #fafbfc;
+}
+
 input[type='text'],
 textarea,
 select {
@@ -122,6 +250,31 @@ textarea {
 .row > div {
   flex: 1;
   min-width: 120px;
+}
+/* 浏览器会话（多页问卷「接着填」） */
+.session-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+.session-line .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.session-line .dot-ok {
+  background: #1f883d;
+}
+.session-line .dot-idle {
+  background: #8c959f;
+}
+.session-line .session-url {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 button {
   padding: 6px 14px;
@@ -177,6 +330,24 @@ th {
 td.answer input {
   min-width: 140px;
 }
+tr.row-filling {
+  background: #ddf4ff;
+}
+/* 底部常驻操作条 */
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
 .badge {
   padding: 2px 8px;
   border-radius: 12px;
@@ -195,16 +366,48 @@ td.answer input {
   background: #ffebe9;
   color: #cf222e;
 }
+.badge.running {
+  background: #ddf4ff;
+  color: #0969da;
+}
+
 .summary {
   display: flex;
-  gap: 16px;
-  margin: 12px 0;
+  gap: 12px;
+  margin: 0 0 12px;
+  flex-wrap: wrap;
 }
 .summary > div {
   background: #fff;
   border: 1px solid #d0d7de;
   border-radius: 6px;
-  padding: 10px 18px;
+  padding: 8px 16px;
+  font-size: 13px;
+}
+.summary > div.sum-bad {
+  border-color: #cf222e;
+}
+
+.summary > div.sum-warn {
+  border-color: #d4a72c;
+  color: #7a5c00;
+}
+.summary > div.sum-ok {
+  border-color: #1a7f37;
+  color: #1a7f37;
+}
+.run-log {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 13px;
+}
+.run-log li {
+  margin-bottom: 4px;
+}
+.ok-msg {
+  color: #1a7f37;
+  font-size: 13px;
+  margin: 0 0 8px;
 }
 .modal-backdrop {
   position: fixed;
@@ -213,6 +416,7 @@ td.answer input {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 .modal {
   background: #fff;
@@ -239,6 +443,113 @@ td.answer input {
   word-break: break-all;
   white-space: pre-wrap;
 }
+/* 「上游变了 → 下游对钩收回」的提示条：挂在流程顶部，步骤卡折叠了也挡不住 */
+.stale-banner {
+  background: #fff8c5;
+  border: 1px solid #d4a72c66;
+  color: #7d4e00;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.stale-banner .stale-head {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.stale-banner .row {
+  margin: 8px 0 0;
+  align-items: center;
+}
+/* 步骤卡内的同款提醒（卡片展开时说明「为什么对钩没了」） */
+.stale-note {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fff8c5;
+  border: 1px solid #d4a72c66;
+  color: #7d4e00;
+  font-size: 13px;
+  line-height: 1.6;
+}
+/* 页面存档条：多页问卷一页一条（切页 / 改名 / 删除），以及识别到的翻页按钮 */
+.page-bar,
+.next-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.page-bar-label {
+  color: #57606a;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+.page-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 8px;
+  border: 1px solid #d0d7de;
+  border-radius: 14px;
+  background: #f6f8fa;
+  color: #24292f;
+  cursor: pointer;
+  max-width: 340px;
+}
+.page-chip:hover {
+  border-color: #8c959f;
+}
+.page-chip.active {
+  border-color: #1f6feb;
+  background: #ddf4ff;
+  color: #0a3069;
+}
+.page-chip .page-no {
+  color: #57606a;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+}
+.page-chip .page-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.page-chip .page-stat {
+  color: #57606a;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.page-chip .close {
+  border: 0;
+  background: transparent;
+  color: #57606a;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 13px;
+  line-height: 1;
+}
+.page-chip .close:hover {
+  color: #cf222e;
+}
+.page-chip .page-rename {
+  width: 150px;
+  padding: 1px 4px;
+  font-size: 12px;
+}
+/* 识别到的翻页按钮：样子像 chip，但它是动作按钮（点了会在浏览器里翻页） */
+.next-chip {
+  border-style: dashed;
+  font-size: 12px;
+}
+.next-chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 .mono {
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 12px;
@@ -247,4 +558,256 @@ td.answer input {
 .hint {
   color: #57606a;
   font-size: 12px;
+}
+/* 左栏（260px 窄列）的长说明折叠块：默认只占一行标题，点开才展开 */
+.side-note {
+  margin-top: 8px;
+}
+.side-note-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: #57606a;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.side-note-head:hover {
+  color: #0969da;
+}
+.side-note-head .chev {
+  display: inline-block;
+  width: 10px;
+  flex: none;
+  transition: transform 0.12s ease;
+}
+.side-note-head .chev-open {
+  transform: rotate(90deg);
+}
+.side-note-body {
+  margin: 4px 0 2px 4px;
+  padding-left: 8px;
+  border-left: 2px solid #d0d7de;
+}
+.side-note-body p {
+  margin: 0 0 6px;
+  color: #57606a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.side-note-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- 任务持久化相关（自动保存 / 任务管理抽屉 / 撤销 toast） ---- */
+
+/* 顶栏右侧操作组 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* 保存态指示灯：不用点，只用来让人确信「不用手动保存」 */
+.save-pill {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 12px;
+  cursor: default;
+}
+.save-pill.saving {
+  background: #fff8c5;
+  border-color: #d4a72c66;
+  color: #9a6700;
+}
+.save-pill.saved {
+  background: #dafbe1;
+  border-color: #82c91e66;
+  color: #1a7f37;
+}
+.save-pill.error {
+  background: #ffebe9;
+  border-color: #ff818266;
+  color: #cf222e;
+  cursor: pointer;
+}
+
+/* 标签就地重命名 */
+.tab-rename {
+  width: 120px;
+  padding: 2px 6px !important;
+  font-size: 13px !important;
+}
+
+/* 任务管理抽屉 */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 10;
+}
+.drawer {
+  width: 540px;
+  max-width: 92vw;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
+}
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #d0d7de;
+}
+.drawer-tabs {
+  display: flex;
+  gap: 4px;
+}
+.drawer-tabs .tab {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.drawer-body {
+  flex: 1;
+  overflow: auto;
+  padding: 12px 14px;
+}
+.drawer-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid #eaeef2;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+/* 任务行 */
+.task-row {
+  border: 1px solid #eaeef2;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.task-row.current {
+  border-color: #0969da;
+  background: #f6fbff;
+}
+.task-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+.task-row-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+.task-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.danger-link {
+  color: #cf222e !important;
+}
+.danger-inline {
+  font-size: 12px;
+  color: #cf222e;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 历史版本 */
+.history {
+  margin-top: 8px;
+  border-top: 1px dashed #d0d7de;
+  padding-top: 8px;
+}
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.snap-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.snap-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+.snap-time {
+  font-size: 12px;
+  color: #24292f;
+  min-width: 152px;
+}
+.badge.snap-auto {
+  background: #eaeef2;
+  color: #57606a;
+}
+.badge.snap-manual {
+  background: #ddf4ff;
+  color: #0969da;
+}
+.badge.snap-key-action {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+.badge.snap-pre-rollback {
+  background: #fff8c5;
+  color: #9a6700;
+}
+
+/* 撤销 toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: #24292f;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.toast button.link {
+  color: #79c0ff;
+}
+.modal-body {
+  margin: 8px 0 16px;
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow: auto;
+}
+
+/* 窄窗口：侧栏收到顶部 */
+@media (max-width: 900px) {
+  .layout-body {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    position: static;
+  }
 }

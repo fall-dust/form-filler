@@ -2,7 +2,18 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>样例调查问卷（九类题型）</title>
+  <title>样例调查问卷（多类题型）</title>
+  <style>
+    .form-item { margin: 12px 0; }
+    #citySelect { width: 200px; padding: 4px 8px; border: 1px solid #999; display: inline-block; }
+    .city-dropdown { border: 1px solid #999; width: 200px; background: #fff; }
+    .city-dropdown li { list-style: none; padding: 4px 8px; cursor: pointer; }
+    .el-switch { width: 40px; height: 20px; border-radius: 10px; background: #ccc; display: inline-block; vertical-align: middle; position: relative; }
+    .el-switch[aria-checked="true"] { background: #409eff; }
+    .el-rate i { cursor: pointer; font-style: normal; font-size: 20px; color: #ccc; }
+    .el-rate i.active { color: #f7ba2a; }
+    .rich-editor { border: 1px solid #999; min-height: 60px; padding: 4px; }
+  </style>
 </head>
 <body>
   <h1>客户满意度调查</h1>
@@ -87,6 +98,134 @@
       </tbody>
     </table>
 
+    <!-- 10. slider（原生 range） -->
+    <div class="form-item">
+      <label for="budget">预算满意度（0-100）？</label>
+      <input type="range" id="budget" name="budget" min="0" max="100" step="1" value="0" />
+      <span id="budgetVal">0</span>
+    </div>
+
+    <!-- 11. rate（星级评分） -->
+    <div class="form-item">
+      <label>服务体验星级？</label>
+      <div class="el-rate" id="rateExp" role="slider" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0">
+        <i class="el-rate__item">★</i><i class="el-rate__item">★</i><i class="el-rate__item">★</i><i class="el-rate__item">★</i><i class="el-rate__item">★</i>
+      </div>
+    </div>
+
+    <!-- 12. switch（开关） -->
+    <div class="form-item">
+      <label>是否开启消息通知？</label>
+      <div class="el-switch" id="notifySwitch" role="switch" aria-checked="false" tabindex="0"></div>
+    </div>
+
+    <!-- 13. richselect（div 模拟下拉） -->
+    <div class="form-item">
+      <label>所在城市？</label>
+      <div class="city-select" id="citySelect" tabindex="0"><span class="placeholder">请选择</span></div>
+      <ul class="city-dropdown" id="cityDropdown" role="listbox" hidden>
+        <li class="city-item" role="option">北京</li>
+        <li class="city-item" role="option">上海</li>
+        <li class="city-item" role="option">广州</li>
+        <li class="city-item" role="option">深圳</li>
+      </ul>
+    </div>
+
+    <!-- 14. richtext（contenteditable 富文本） -->
+    <div class="form-item">
+      <label for="bio">个人简介？</label>
+      <div id="bio" class="rich-editor" contenteditable="true"></div>
+    </div>
+
+    <!-- 15. 面板式日期（readonly 输入 + 日历面板） -->
+    <div class="form-item">
+      <label for="visitDate">来访日期？</label>
+      <input type="text" id="visitDate" readonly />
+      <div class="el-picker-panel" id="visitPanel" hidden>
+        <table>
+          <tr><td class="available">14</td><td class="available">15</td><td class="available">16</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- 16. iframe 嵌入子表单（公司名称/部门在子 frame 内） -->
+    <div class="form-item">
+      <label>单位信息（嵌入子表单）：</label>
+      <iframe src="iframe_child.html" id="embed" width="480" height="160"></iframe>
+    </div>
+
   </form>
+
+  <!-- 提交按钮区：混入干扰项，验证打分制不会点错——
+       「保存草稿/下一步」带组件库主按钮样式但语义被排除；
+       「提交(disabled)」文本命中但不可点击；
+       真正的提交按钮是纯样式的「提交问卷」 -->
+  <div style="margin: 16px 0">
+    <button type="button" class="el-button el-button--primary" id="saveDraftBtn">保存草稿</button>
+    <button type="button" class="el-button el-button--primary" id="nextStepBtn">下一步</button>
+    <button type="button" id="disabledSubmitBtn" disabled>提交</button>
+    <button type="button" id="submitBtn">提交问卷</button>
+  </div>
+  <script>
+    document.getElementById('saveDraftBtn').addEventListener('click', function () {
+      window.__wrongClick = 'saveDraft'
+    })
+    document.getElementById('nextStepBtn').addEventListener('click', function () {
+      window.__wrongClick = 'nextStep'
+    })
+    document.getElementById('disabledSubmitBtn').addEventListener('click', function () {
+      window.__wrongClick = 'disabledSubmit'
+    })
+    document.getElementById('submitBtn').addEventListener('click', function () {
+      window.__submitted = true
+    })
+  </script>
+
+  <script>
+    // slider 数值回显
+    var budget = document.getElementById('budget')
+    budget.addEventListener('input', function () {
+      document.getElementById('budgetVal').textContent = budget.value
+    })
+
+    // rate 点亮星星
+    var rateItems = document.querySelectorAll('#rateExp .el-rate__item')
+    rateItems.forEach(function (star, i) {
+      star.addEventListener('click', function () {
+        rateItems.forEach(function (s, j) { s.classList.toggle('active', j <= i) })
+        document.getElementById('rateExp').setAttribute('aria-valuenow', String(i + 1))
+      })
+    })
+
+    // switch 切换
+    var sw = document.getElementById('notifySwitch')
+    sw.addEventListener('click', function () {
+      sw.setAttribute('aria-checked', sw.getAttribute('aria-checked') === 'true' ? 'false' : 'true')
+    })
+
+    // richselect 展开/选择
+    var citySelect = document.getElementById('citySelect')
+    var cityDropdown = document.getElementById('cityDropdown')
+    citySelect.addEventListener('click', function () { cityDropdown.hidden = !cityDropdown.hidden })
+    cityDropdown.addEventListener('click', function (e) {
+      var t = e.target
+      if (t.classList && t.classList.contains('city-item')) {
+        citySelect.querySelector('.placeholder').textContent = t.textContent
+        cityDropdown.hidden = true
+      }
+    })
+
+    // 面板式日期：点击输入框弹出，点日期回填
+    var visitDate = document.getElementById('visitDate')
+    var visitPanel = document.getElementById('visitPanel')
+    visitDate.addEventListener('click', function () { visitPanel.hidden = !visitPanel.hidden })
+    visitPanel.addEventListener('click', function (e) {
+      var t = e.target
+      if (t.classList && t.classList.contains('available')) {
+        visitDate.value = '2026-09-' + t.textContent
+        visitPanel.hidden = true
+      }
+    })
+  </script>
 </body>
 </html>

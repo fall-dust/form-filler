@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>腾讯问卷（TDesign）式样例：易变 name 的单选 + 可搜索下拉</title>
+    <style>
+      body {
+        font-family: 'Microsoft YaHei', sans-serif;
+        margin: 24px;
+        color: #1f2329;
+      }
+      .question-list {
+        max-width: 720px;
+      }
+      .question {
+        margin-bottom: 28px;
+        padding: 16px;
+        background: #f7f9fb;
+        border-radius: 8px;
+      }
+      .question-title {
+        font-size: 15px;
+        margin: 0 0 12px;
+      }
+      .question-seq {
+        color: #d54941;
+        margin-right: 4px;
+      }
+      /* 真实控件被藏起来（零尺寸 + 透明）——直接 check() 不可能成功，只能点 label */
+      .checkbox-input {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .checkbox-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        margin-bottom: 6px;
+        background: #fff;
+        border: 1px solid #e7e9eb;
+        border-radius: 6px;
+      }
+      .checkbox-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        cursor: pointer;
+        margin: 0;
+      }
+      .radio-box {
+        width: 14px;
+        height: 14px;
+        border: 1px solid #a4a8ad;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .checkbox-option:has(input:checked) .radio-box {
+        border: 4px solid #0052d9;
+      }
+      .cell-m {
+        margin: 0;
+      }
+      /* TDesign 风格下拉 */
+      .t-select__wrap {
+        display: inline-block;
+        width: 260px;
+      }
+      .t-input__wrap {
+        border: 1px solid #dcdcdc;
+        border-radius: 4px;
+        background: #fff;
+      }
+      .t-input__inner {
+        width: 100%;
+        border: 0;
+        outline: none;
+        padding: 8px 10px;
+        font-size: 14px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .t-select {
+        cursor: pointer;
+      }
+      .t-select__dropdown {
+        position: absolute;
+        z-index: 20;
+        width: 260px;
+        max-height: 240px;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid #e7e9eb;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+      .t-select__search {
+        border-bottom: 1px solid #eee;
+      }
+      .t-select__list {
+        list-style: none;
+        margin: 0;
+        padding: 4px 0;
+      }
+      .t-select-option {
+        padding: 7px 12px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .t-select-option:hover {
+        background: #f2f3f5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="question-list">
+      <!-- 38 单选：每个选项的 name 前缀是「渲染序号」，整块重渲染后会变（复刻腾讯问卷） -->
+      <section
+        class="question question-type-radio"
+        id="question_q-38-8883"
+        data-question-id="q-38-8883"
+      >
+        <h2 class="question-title"><span class="question-seq">38</span>您的性别是</h2>
+        <div class="question-body" id="body-q38"></div>
+      </section>
+
+      <!-- 39 下拉：TDesign 风格，浮层是 .t-select__dropdown，内含搜索框 -->
+      <section
+        class="question question-type-select"
+        id="question_q-39-a55b"
+        data-question-id="q-39-a55b"
+      >
+        <h2 class="question-title"><span class="question-seq">39</span>您的出生年份是？</h2>
+        <div class="question-body">
+          <div class="t-select__wrap">
+            <div class="t-select t-select-input t-select-input--empty" id="year-select">
+              <div class="t-input__wrap">
+                <div class="t-input t-is-readonly">
+                  <input
+                    class="t-input__inner"
+                    type="text"
+                    readonly
+                    placeholder="请选择"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      /* ---------------- 38 单选（易变 name + 兄弟 label） ---------------- */
+      // 前缀模拟框架自动生成的渲染序号：每次整块重渲染都会变，
+      // 任何写死 "809-q-38-8883" 这类 name 的选择器都会在重渲染后失配。
+      let uid = 809
+      const GENDER_OPTIONS = [
+        { text: '男', value: 'o-101-66e9' },
+        { text: '女', value: 'o-102-c5d6' }
+      ]
+      let genderValue = ''
+
+      function renderGender() {
+        const box = document.getElementById('body-q38')
+        box.innerHTML = ''
+        GENDER_OPTIONS.forEach((opt) => {
+          const wrap = document.createElement('div')
+          wrap.className = 'checkbox-option'
+
+          const input = document.createElement('input')
+          input.className = 'checkbox-input'
+          input.type = 'radio'
+          input.name = uid++ + '-q-38-8883' // ← 易变：每次渲染都换
+          input.id = 'q-38-8883-' + opt.value // ← 稳定：不随渲染变化
+          input.value = opt.value
+          input.checked = genderValue === opt.value
+          input.addEventListener('change', () => {
+            genderValue = input.value
+            renderGender() // 选中即整块重渲染（复刻框架行为）
+          })
+
+          const label = document.createElement('label')
+          label.className = 'cell flex-start checkbox-cell'
+          label.setAttribute('for', input.id)
+          label.innerHTML =
+            '<span class="radio-box"></span><p class="cell-m">' + opt.text + '</p>'
+
+          wrap.appendChild(input)
+          wrap.appendChild(label)
+          box.appendChild(wrap)
+        })
+      }
+      renderGender()
+
+      /* ---------------- 39 可搜索下拉（.t-select__dropdown） ---------------- */
+      const YEARS = []
+      for (let y = 2006; y >= 1990; y--) {
+        YEARS.push(y === 2006 ? '2006年后' : y + '年')
+      }
+      const yearTrigger = document.getElementById('year-select')
+      const yearInput = yearTrigger.querySelector('input')
+      let yearPopup = null
+
+      function closeYearPopup() {
+        if (yearPopup) {
+          yearPopup.remove()
+          yearPopup = null
+        }
+      }
+
+      function renderYearOptions(list, keyword) {
+      const ul = yearPopup.querySelector('.t-select__list')
+        ul.innerHTML = ''
+        list
+          .filter((t) => !keyword || t.indexOf(keyword) >= 0)
+          .forEach((t) => {
+            const li = document.createElement('li')
+            li.className = 't-select-option'
+            li.textContent = t
+            li.addEventListener('click', () => {
+              yearInput.value = t
+              yearTrigger.classList.remove('t-select-input--empty')
+              closeYearPopup()
+            })
+            ul.appendChild(li)
+          })
+      }
+
+      function openYearPopup() {
+        closeYearPopup()
+        yearPopup = document.createElement('div')
+        yearPopup.className = 't-select__dropdown'
+        yearPopup.style.left = yearTrigger.getBoundingClientRect().left + 'px'
+        yearPopup.style.top = yearTrigger.getBoundingClientRect().bottom + 4 + 'px'
+
+        const searchWrap = document.createElement('div')
+        searchWrap.className = 't-select__search'
+        const search = document.createElement('input')
+        search.className = 't-input__inner'
+        search.type = 'text'
+        search.placeholder = '搜索'
+        search.addEventListener('input', () => renderYearOptions(YEARS, search.value.trim()))
+        searchWrap.appendChild(search)
+
+        const ul = document.createElement('ul')
+        ul.className = 't-select__list'
+
+        yearPopup.appendChild(searchWrap)
+        yearPopup.appendChild(ul)
+        document.body.appendChild(yearPopup)
+        renderYearOptions(YEARS, '')
+
+        // 模拟框架异步挂载浮层
+        yearPopup.style.visibility = 'hidden'
+        setTimeout(() => {
+          if (yearPopup) yearPopup.style.visibility = 'visible'
+        }, 120)
+      }
+
+      yearTrigger.addEventListener('click', (e) => {
+        if (yearPopup && yearPopup.contains(e.target)) return
+        openYearPopup()
+      })
+    </script>
+  </body>
+</html>
